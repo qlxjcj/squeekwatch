@@ -1,4 +1,5 @@
 import { apiGet } from "./lib/api";
+import { I18nProvider } from "./lib/i18n";
 import type {
   CoreResponse,
   EconomyStateResponse,
@@ -10,6 +11,7 @@ import type {
 } from "./lib/types";
 import { usePoll } from "./hooks/usePoll";
 import { Header, type FeedState } from "./components/Header";
+import { Hero } from "./components/Hero";
 import { LivePanel } from "./components/LivePanel";
 import { ChainPanel } from "./components/ChainPanel";
 import { ActivityPanel } from "./components/ActivityPanel";
@@ -32,6 +34,14 @@ const INTERVALS = {
 } as const;
 
 export default function App() {
+  return (
+    <I18nProvider>
+      <Dashboard />
+    </I18nProvider>
+  );
+}
+
+function Dashboard() {
   const status = usePoll(() => apiGet<StatusResponse>("/v1/status"), INTERVALS.status);
   const blocks = usePoll(() => apiGet<MeasurementBlocksResponse>("/v1/measurement/blocks"), INTERVALS.blocks);
   const core = usePoll(() => apiGet<CoreResponse>("/v1/core"), INTERVALS.core);
@@ -68,6 +78,7 @@ export default function App() {
     <div className="app">
       <Header state={feedState} updatedAt={status.updatedAt} onRefresh={refreshAll} />
       <main className="app-main">
+        <Hero core={core.data} economy={economy.data} settlements={settlements.data} />
         <LivePanel status={status.data} blocks={blocks.data} error={status.error} />
         <ChainPanel core={core.data} blocks={blocks.data} economy={economy.data} />
         <div className="two-col">

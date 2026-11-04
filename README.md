@@ -1,5 +1,7 @@
 # SqueekWatch 🐹
 
+![SqueekWatch — live dashboard for Squeekchain](assets/squeekwatch-banner.svg)
+
 **A live dashboard for [Squeekchain](https://squeekchain.com) — the hamster-powered proof-of-work toychain on Ethereum Sepolia.**
 
 Watch Squeektoshi's wheel turn in real time, follow Squeek blocks as they complete, see settlements
@@ -24,6 +26,8 @@ land on Ethereum, and explore the whole SQK economy — all from one page, power
 
 Extra touches:
 
+- **EN / 中文** — one-click language toggle in the header (English by default, so the review team
+  sees an English app; 中文 for the community).
 - **Honest numbers** — when the API answers `"status": "unavailable"`, the UI shows *unknown*,
   never zero. All big numbers are handled as `BigInt` (the API sends them as decimal strings).
 - **Auto-refresh** with polling intervals tuned to the API's per-IP rate limits, plus a manual
@@ -32,6 +36,15 @@ Extra touches:
   `<img>` and never injected as markup (per the docs' security guidance).
 - **Zero chart libraries** — every chart and gauge is hand-rolled SVG/CSS, so the bundle stays
   tiny and installs are fast.
+
+## Screenshots
+
+<!-- TODO: run `npm run dev`, capture the dashboard and a Squeek card, save them into
+     assets/ (e.g. assets/shot-dashboard.png) and replace the placeholders below. -->
+
+| Dashboard | Squeek viewer |
+| --- | --- |
+| ![dashboard](assets/squeekwatch-banner.svg) | _screenshot coming after deploy_ |
 
 ## Tech stack
 
@@ -70,9 +83,11 @@ src/
   lib/types.ts             # response types for the Squeekchain API
   lib/api.ts               # fetch client (429/503 backoff) + contract addresses
   lib/format.ts            # BigInt-safe formatting for units, distances, time
+  lib/i18n.tsx             # EN / 中文 dictionary and language context
   hooks/usePoll.ts         # polling hook with error resilience
   components/
-    Header.tsx             # brand, live status pill, refresh
+    Header.tsx             # brand, live status pill, language toggle, refresh
+    Hero.tsx               # banner with dot-matrix wheel art and live stats
     LivePanel.tsx          # wheel telemetry + pipeline stages
     ChainPanel.tsx         # Squeek blocks, difficulty, provisional blocks
     ActivityPanel.tsx      # 7-day charts and records
@@ -102,7 +117,7 @@ SqueekWatch 是一个 Squeekchain（仓鼠驱动的工作量证明 "玩具链"�
 - 🪙 SQK 经济：供应量 vs 21 亿上限、挖矿产出、质押、Squeek 等级表
 - 📡 实时事件流 + 任意地址的账户/资产查询
 
-纯只读、不连钱包、不签名；数据全部来自官方公开 API。用 `npm install && npm run dev` 即可本地运行。
+纯只读、不连钱包、不签名；数据全部来自官方公开 API。右上角可一键切换 **EN / 中文** 界面。用 `npm install && npm run dev` 即可本地运行。
 
 ## Genesis · Code lane
 

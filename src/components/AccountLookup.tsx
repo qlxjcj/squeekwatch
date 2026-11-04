@@ -1,19 +1,15 @@
 import { useState } from "react";
 import type { AccountResponse, SqueekResponse } from "../lib/types";
 import { apiGet, explorerAddress } from "../lib/api";
-import {
-  formatCount,
-  formatUnits,
-  isAddress,
-  isZeroAddress,
-  shortHex,
-} from "../lib/format";
+import { formatCount, formatUnits, isAddress, isZeroAddress, shortHex } from "../lib/format";
+import { useI18n } from "../lib/i18n";
 import { BarChart } from "./Charts";
 import { Chip, Notice, Panel, Stat } from "./ui";
 
 const EXAMPLE_ACCOUNT = "0x828cb04dbf0bdd8eb35d19045638a1af6e3d17e8"; // Hamster-Owned Liquidity Safe
 
 export function AccountLookup() {
+  const { t } = useI18n();
   const [addressInput, setAddressInput] = useState("");
   const [account, setAccount] = useState<AccountResponse | null>(null);
   const [accountError, setAccountError] = useState<string | null>(null);
@@ -27,7 +23,7 @@ export function AccountLookup() {
   const lookupAccount = async (value: string) => {
     const address = value.trim();
     if (!isAddress(address) || isZeroAddress(address)) {
-      setAccountError("Enter a valid non-zero 0x address (40 hex characters).");
+      setAccountError(t("acc.invalid"));
       setAccount(null);
       return;
     }
@@ -46,7 +42,7 @@ export function AccountLookup() {
   const lookupSqueek = async (value: string) => {
     const id = value.trim();
     if (!/^\d{1,4}$/.test(id) || Number(id) < 1 || Number(id) > 9999) {
-      setSqueekError("Token ID must be a number from 1 to 9999.");
+      setSqueekError(t("acc.invalidId"));
       setSqueek(null);
       return;
     }
@@ -63,14 +59,11 @@ export function AccountLookup() {
   };
 
   return (
-    <Panel
-      title="Account & Squeek lookup"
-      subtitle="Rewards, power and Squeeks for any address · images served as data URIs, rendered safely"
-    >
+    <Panel title={t("acc.title")} subtitle={t("acc.sub")}>
       <div className="lookup-form">
         <input
           className="lookup-input mono"
-          placeholder="0x… wallet address"
+          placeholder={t("acc.placeholder")}
           value={addressInput}
           onChange={(e) => setAddressInput(e.target.value)}
           onKeyDown={(e) => {
@@ -79,7 +72,7 @@ export function AccountLookup() {
           spellCheck={false}
         />
         <button type="button" className="btn btn-primary" onClick={() => void lookupAccount(addressInput)} disabled={accountLoading}>
-          {accountLoading ? "loading…" : "look up"}
+          {accountLoading ? t("acc.loading") : t("acc.lookup")}
         </button>
         <button
           type="button"
@@ -89,7 +82,7 @@ export function AccountLookup() {
             void lookupAccount(EXAMPLE_ACCOUNT);
           }}
         >
-          try example
+          {t("acc.tryExample")}
         </button>
       </div>
       {accountError ? <Notice tone="error">{accountError}</Notice> : null}
@@ -97,33 +90,28 @@ export function AccountLookup() {
       {account && account.status === "available" ? (
         <div className="account-card">
           <div className="stat-row">
+            <Stat label={t("acc.claimable")} value={`${formatUnits(account.rewards.claimableBaseUnits, 18, 4)} SQK`} tone="gold" />
+            <Stat label={t("acc.lifetimeClaimed")} value={`${formatUnits(account.rewards.lifetimePaidBaseUnits, 18, 2)} SQK`} />
+            <Stat label={t("acc.nftPower")} value={formatCount(account.power.nftPower)} sub={t("acc.fromSqueeks")} />
+            <Stat label={t("acc.sqkPower")} value={formatCount(account.power.sqkPower)} sub={t("acc.fromStaked")} />
             <Stat
-              label="Claimable now"
-              value={`${formatUnits(account.rewards.claimableBaseUnits, 18, 4)} SQK`}
-              tone="gold"
-            />
-            <Stat label="Lifetime claimed" value={`${formatUnits(account.rewards.lifetimePaidBaseUnits, 18, 2)} SQK`} />
-            <Stat label="NFT power" value={formatCount(account.power.nftPower)} sub="from deposited Squeeks" />
-            <Stat label="SQK power" value={formatCount(account.power.sqkPower)} sub="from staked SQK" />
-            <Stat
-              label="Squeeks"
-              value={formatCount(
-                (Number(account.tokenCounts?.staking ?? 0) + Number(account.tokenCounts?.wallet ?? 0)).toString(),
-              )}
-              sub={`${account.tokenCounts?.staking ?? 0} staking · ${account.tokenCounts?.wallet ?? 0} wallet`}
+              label={t("acc.squeeks")}
+              value={formatCount((Number(account.tokenCounts?.staking ?? 0) + Number(account.tokenCounts?.wallet ?? 0)).toString())}
+              sub={`${account.tokenCounts?.staking ?? 0} ${t("acc.stakingWord")} · ${account.tokenCounts?.wallet ?? 0} ${t("acc.walletWord")}`}
             />
           </div>
 
           {account.stake ? (
             <p className="fine-print">
-              staked principal {formatUnits(account.stake.principalBaseUnits, 18, 2)} SQK (
-              {formatUnits(account.stake.freshBaseUnits, 18, 2)} fresh · {formatUnits(account.stake.matureBaseUnits, 18, 2)} mature)
+              {t("acc.stakedPrincipal")} {formatUnits(account.stake.principalBaseUnits, 18, 2)} SQK (
+              {formatUnits(account.stake.freshBaseUnits, 18, 2)} {t("acc.fresh")} · {formatUnits(account.stake.matureBaseUnits, 18, 2)}{" "}
+              {t("acc.mature")})
             </p>
           ) : null}
 
           {account.earnings && account.earnings.length > 0 ? (
             <>
-              <h3 className="sub-title">Earnings · last 7 days</h3>
+              <h3 className="sub-title">{t("acc.earnings")}</h3>
               <BarChart
                 height={100}
                 color="var(--purple)"
@@ -139,7 +127,7 @@ export function AccountLookup() {
 
           {account.tokens && account.tokens.length > 0 ? (
             <>
-              <h3 className="sub-title">Squeeks held (click to view)</h3>
+              <h3 className="sub-title">{t("acc.held")}</h3>
               <div className="token-grid">
                 {account.tokens.map((token) => (
                   <button
@@ -152,21 +140,27 @@ export function AccountLookup() {
                     }}
                   >
                     <span className="mono">#{token.tokenId}</span>
-                    <span>LV {token.level}</span>
+                    <span>
+                      {t("acc.level")} {token.level}
+                    </span>
                     <Chip tone={token.custody === "staking" ? "purple" : "blue"}>{token.custody}</Chip>
                   </button>
                 ))}
               </div>
             </>
           ) : (
-            <p className="chart-empty">No Squeeks in this account</p>
+            <p className="chart-empty">{t("acc.none")}</p>
           )}
 
           <p className="fine-print">
-            account <a href={explorerAddress(account.account)} target="_blank" rel="noopener noreferrer" className="mono">{shortHex(account.account)}</a>
+            <span className="muted">{t("acc.owner")}</span>{" "}
+            <a href={explorerAddress(account.account)} target="_blank" rel="noopener noreferrer" className="mono">
+              {shortHex(account.account)}
+            </a>
             {account.claimRecipient ? (
               <>
-                {" "}· claims pay to{" "}
+                {" "}
+                · {t("acc.claimsPayTo")}{" "}
                 <a href={explorerAddress(account.claimRecipient)} target="_blank" rel="noopener noreferrer" className="mono">
                   {shortHex(account.claimRecipient)}
                 </a>
@@ -175,14 +169,14 @@ export function AccountLookup() {
           </p>
         </div>
       ) : account && account.reason ? (
-        <Notice tone="warn">Account unavailable: {account.reason}</Notice>
+        <Notice tone="warn">{account.reason}</Notice>
       ) : null}
 
-      <h3 className="sub-title">Squeek viewer</h3>
+      <h3 className="sub-title">{t("acc.viewer")}</h3>
       <div className="lookup-form">
         <input
           className="lookup-input mono"
-          placeholder="token ID (1–9999)"
+          placeholder={t("acc.tokenPlaceholder")}
           value={tokenInput}
           onChange={(e) => setTokenInput(e.target.value)}
           onKeyDown={(e) => {
@@ -191,7 +185,7 @@ export function AccountLookup() {
           inputMode="numeric"
         />
         <button type="button" className="btn btn-primary" onClick={() => void lookupSqueek(tokenInput)} disabled={squeekLoading}>
-          {squeekLoading ? "loading…" : "view Squeek"}
+          {squeekLoading ? t("acc.loading") : t("acc.viewSqueek")}
         </button>
       </div>
       {squeekError ? <Notice tone="error">{squeekError}</Notice> : null}
@@ -208,26 +202,31 @@ export function AccountLookup() {
               alt={squeek.metadata.name ?? `Squeek #${squeek.tokenId}`}
             />
           ) : (
-            <div className="squeek-art squeek-art-placeholder">no art yet</div>
+            <div className="squeek-art squeek-art-placeholder">{t("acc.noArt")}</div>
           )}
           <div className="squeek-meta">
             <h3>{squeek.metadata?.name ?? `Squeek #${squeek.tokenId}`}</h3>
             <div className="stat-row">
-              <Stat label="Level" value={squeek.level} />
-              <Stat label="Base power" value={formatCount(squeek.basePower)} tone="gold" />
-              <Stat label="Merge state" value={squeek.mergeState ?? "—"} sub={`next merge at block #${formatCount(squeek.nextMergeHeight)}`} />
+              <Stat label={t("acc.level")} value={squeek.level} />
+              <Stat label={t("acc.basePower")} value={formatCount(squeek.basePower)} tone="gold" />
+              <Stat
+                label={t("acc.mergeState")}
+                value={squeek.mergeState ?? "—"}
+                sub={`${t("acc.nextMerge")} #${formatCount(squeek.nextMergeHeight)}`}
+              />
             </div>
             <p className="fine-print">
-              owner{" "}
+              <span className="muted">{t("acc.owner")}</span>{" "}
               <a href={explorerAddress(squeek.custody.owner ?? "")} target="_blank" rel="noopener noreferrer" className="mono">
                 {shortHex(squeek.custody.owner)}
               </a>
               {squeek.custody.depositor ? (
                 <>
-                  {" "}· deposited by <span className="mono">{shortHex(squeek.custody.depositor)}</span>
+                  {" "}
+                  · {t("acc.depositedBy")} <span className="mono">{shortHex(squeek.custody.depositor)}</span>
                 </>
               ) : null}
-              {squeek.custody.burned ? " · burned" : ""}
+              {squeek.custody.burned ? ` · ${t("acc.burned")}` : ""}
             </p>
             {squeek.metadata?.attributes && squeek.metadata.attributes.length > 0 ? (
               <div className="trait-grid">
@@ -241,7 +240,7 @@ export function AccountLookup() {
           </div>
         </div>
       ) : squeek && squeek.reason ? (
-        <Notice tone="warn">Squeek unavailable: {squeek.reason}</Notice>
+        <Notice tone="warn">{squeek.reason}</Notice>
       ) : null}
     </Panel>
   );

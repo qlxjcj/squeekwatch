@@ -1,8 +1,16 @@
 import { DOCS, OFFICIAL } from "../lib/api";
 import { formatAgo } from "../lib/format";
-import { Chip, OutLink } from "./ui";
+import { useI18n, type Lang } from "../lib/i18n";
+import { Chip } from "./ui";
 
 export type FeedState = "online" | "stale" | "offline" | "unknown";
+
+const STATE_KEY: Record<FeedState, string> = {
+  online: "header.online",
+  stale: "header.stale",
+  offline: "header.offline",
+  unknown: "header.connecting",
+};
 
 export function Header({
   state,
@@ -13,15 +21,8 @@ export function Header({
   updatedAt: number | null;
   onRefresh: () => void;
 }) {
+  const { t, lang, setLang } = useI18n();
   const tone = state === "online" ? "green" : state === "stale" ? "gold" : state === "offline" ? "red" : "gray";
-  const text =
-    state === "online"
-      ? "WHEEL LIVE"
-      : state === "stale"
-        ? "MEASUREMENT STALE"
-        : state === "offline"
-          ? "NO DATA"
-          : "CONNECTING";
 
   return (
     <header className="site-header">
@@ -37,21 +38,37 @@ export function Header({
             <h1 className="brand-name">
               SQUEEK<span className="brand-accent">WATCH</span>
             </h1>
-            <p className="brand-tag">Squeekchain live dashboard · hamster-powered PoW on Sepolia</p>
+            <p className="brand-tag">{t("header.tag")}</p>
           </div>
         </div>
         <nav className="site-nav">
           <Chip tone={tone}>
-            <span className={`pulse pulse-${tone}`} /> {text}
+            <span className={`pulse pulse-${tone}`} /> {t(STATE_KEY[state])}
           </Chip>
           <span className="nav-updated">
-            updated {updatedAt ? formatAgo(new Date(updatedAt).toISOString()) : "—"}
+            {t("header.updated")} {updatedAt ? formatAgo(new Date(updatedAt).toISOString()) : "—"}
           </span>
           <button type="button" className="btn" onClick={onRefresh}>
-            ↻ refresh
+            {t("header.refresh")}
           </button>
-          <OutLink href={DOCS}>docs</OutLink>
-          <OutLink href={OFFICIAL}>squeekchain.com</OutLink>
+          <div className="lang-toggle" role="group" aria-label="language">
+            {(["en", "zh"] as Lang[]).map((code) => (
+              <button
+                key={code}
+                type="button"
+                className={`lang-btn ${lang === code ? "lang-btn-active" : ""}`}
+                onClick={() => setLang(code)}
+              >
+                {code === "en" ? "EN" : "中文"}
+              </button>
+            ))}
+          </div>
+          <a href={DOCS} target="_blank" rel="noopener noreferrer">
+            {t("nav.docs")}
+          </a>
+          <a href={OFFICIAL} target="_blank" rel="noopener noreferrer">
+            {t("nav.site")}
+          </a>
         </nav>
       </div>
     </header>

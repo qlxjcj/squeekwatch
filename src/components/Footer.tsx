@@ -1,59 +1,60 @@
 import { CONTRACTS, DOCS, EXPLORER, OFFICIAL, explorerAddress } from "../lib/api";
-import { OutLink } from "./ui";
+import { useI18n } from "../lib/i18n";
 
 export function Footer() {
+  const { t } = useI18n();
   return (
     <footer className="site-footer">
       <div className="footer-grid">
         <div>
           <h3 className="sub-title">SqueekWatch</h3>
-          <p>
-            A community dashboard for Squeekchain, the hamster-powered proof-of-work toychain on
-            Ethereum Sepolia. Data comes from the official public API; the app is strictly
-            read-only — no wallet connection, nothing is ever signed.
-          </p>
-          <p className="fine-print">
-            Built for the Squeekchain Genesis · Code lane. Not affiliated with or endorsed by the
-            Squeekchain team. Testnet software: nothing here is financial advice.
-          </p>
+          <p>{t("foot.about")}</p>
+          <p className="fine-print">{t("foot.builtFor")}</p>
         </div>
         <div>
-          <h3 className="sub-title">Contracts (Sepolia)</h3>
+          <h3 className="sub-title">{t("foot.contracts")}</h3>
           <ul className="footer-list">
             {Object.entries(CONTRACTS).map(([name, address]) => (
               <li key={name}>
-                <OutLink href={explorerAddress(address)}>
+                <a href={explorerAddress(address)} target="_blank" rel="noopener noreferrer">
                   {name} · {address.slice(0, 10)}…
-                </OutLink>
+                </a>
               </li>
             ))}
           </ul>
         </div>
         <div>
-          <h3 className="sub-title">Links</h3>
+          <h3 className="sub-title">{t("foot.links")}</h3>
           <ul className="footer-list">
             <li>
-              <OutLink href={DOCS}>Documentation</OutLink>
+              <a href={DOCS} target="_blank" rel="noopener noreferrer">
+                {t("foot.docs")}
+              </a>
             </li>
             <li>
-              <OutLink href="https://docs.squeekchain.com/developers/api/">API reference</OutLink>
+              <a href="https://docs.squeekchain.com/developers/api/" target="_blank" rel="noopener noreferrer">
+                {t("foot.api")}
+              </a>
             </li>
             <li>
-              <OutLink href="https://docs.squeekchain.com/whitepaper/">Whitepaper</OutLink>
+              <a href="https://docs.squeekchain.com/whitepaper/" target="_blank" rel="noopener noreferrer">
+                {t("foot.whitepaper")}
+              </a>
             </li>
             <li>
-              <OutLink href={OFFICIAL}>squeekchain.com</OutLink>
+              <a href={OFFICIAL} target="_blank" rel="noopener noreferrer">
+                squeekchain.com
+              </a>
             </li>
             <li>
-              <OutLink href={EXPLORER}>Block explorer</OutLink>
+              <a href={EXPLORER} target="_blank" rel="noopener noreferrer">
+                {t("foot.explorer")}
+              </a>
             </li>
           </ul>
         </div>
       </div>
-      <p className="footer-note mono">
-        chain 11155111 (Sepolia) · data delayed 12 confirmations · &quot;unavailable&quot; means
-        unknown, never zero
-      </p>
+      <p className="footer-note mono">{t("foot.note")}</p>
     </footer>
   );
 }

@@ -1,11 +1,6 @@
 import type { CoreResponse, EconomyStateResponse, MeasurementBlocksResponse } from "../lib/types";
-import {
-  formatCount,
-  formatDuration,
-  formatTime,
-  toBig,
-  toNum,
-} from "../lib/format";
+import { formatCount, formatDuration, formatTime, toBig, toNum } from "../lib/format";
+import { useI18n } from "../lib/i18n";
 import { ProgressBar } from "./Charts";
 import { Chip, Notice, Panel, Stat } from "./ui";
 
@@ -18,6 +13,7 @@ export function ChainPanel({
   blocks: MeasurementBlocksResponse | null;
   economy: EconomyStateResponse | null;
 }) {
+  const { t } = useI18n();
   const state = core?.core ?? null;
   const config = core?.configuration ?? null;
   const units = toBig(config?.blockUnitsPerBlock ?? 1_000_000_000) ?? 1_000_000_000n;
@@ -40,58 +36,64 @@ export function ChainPanel({
 
   return (
     <Panel
-      title="Squeek blocks · settled work"
-      subtitle="Height counts from cumulative block units, never from raw work"
+      title={t("chain.title")}
+      subtitle={t("chain.sub")}
       right={
-        state ? (
-          <Chip tone={state.paused ? "red" : "green"}>{state.paused ? "SETTLEMENT PAUSED" : "SETTLING"}</Chip>
-        ) : null
+        state ? <Chip tone={state.paused ? "red" : "green"}>{state.paused ? t("chain.paused") : t("chain.settling")}</Chip> : null
       }
     >
-      {core?.reason ? <Notice tone="warn">SqueekCore state unavailable: {core.reason}</Notice> : null}
+      {core?.reason ? (
+        <Notice tone="warn">
+          SqueekCore: {core.reason}
+        </Notice>
+      ) : null}
 
       <div className="stat-row">
         <Stat
-          label="Squeek block height"
+          label={t("chain.height")}
           value={`#${formatCount(state?.blockHeight)}`}
-          sub={blocks ? `projected #${formatCount(blocks.projected.blockHeight)}` : undefined}
+          sub={blocks ? `${t("chain.projected")} #${formatCount(blocks.projected.blockHeight)}` : undefined}
           tone="gold"
         />
         <Stat
-          label="Current round"
+          label={t("chain.round")}
           value={currentRound ?? "—"}
-          sub={roundEndsIn ? `next round in ${roundEndsIn}` : undefined}
+          sub={roundEndsIn ? `${t("chain.nextRoundIn")} ${roundEndsIn}` : undefined}
         />
         <Stat
-          label="Difficulty"
-          value={`${formatCount(state?.workPerThousandBlocks)} / 1k blocks`}
-          sub="work per thousand blocks"
+          label={t("chain.difficulty")}
+          value={`${formatCount(state?.workPerThousandBlocks)} ${t("chain.per1k")}`}
+          sub={t("chain.difficultySub")}
         />
-        <Stat label="Settled work" value={`${formatCount(state?.cumulativeWork)} units`} sub={`through round ${formatCount(state?.settledThroughRound)}`} />
-        <Stat label="Cumulative block units" value={formatCount(state?.cumulativeBlockUnits)} />
+        <Stat
+          label={t("chain.settledWork")}
+          value={`${formatCount(state?.cumulativeWork)} ${t("chain.units")}`}
+          sub={`${t("chain.throughRound")} ${formatCount(state?.settledThroughRound)}`}
+        />
+        <Stat label={t("chain.cumulative")} value={formatCount(state?.cumulativeBlockUnits)} />
       </div>
 
       <div className="block-progress">
         <div className="block-progress-head">
           <span>
-            block #{formatCount(state ? (toBig(state.blockHeight) ?? 0n) + 1n : null)} progress
+            {t("chain.block")} #{formatCount(state ? (toBig(state.blockHeight) ?? 0n) + 1n : null)} {t("chain.progress")}
           </span>
           <span className="mono">
-            {formatCount(progress)} / {formatCount(units)} units · {(progressPct * 100).toFixed(1)}%
+            {formatCount(progress)} / {formatCount(units)} {t("chain.units")} · {(progressPct * 100).toFixed(1)}%
           </span>
         </div>
         <ProgressBar value={progressPct} tone="gold" height={12} />
       </div>
 
-      <h3 className="sub-title">Provisional blocks (accepted work, awaiting settlement)</h3>
+      <h3 className="sub-title">{t("chain.provisionalTitle")}</h3>
       {blocks && blocks.status === "available" && blocks.blocks.length > 0 ? (
         <table className="data-table">
           <thead>
             <tr>
-              <th>Height</th>
-              <th>Round</th>
-              <th>Work threshold</th>
-              <th>Crossed at</th>
+              <th>{t("chain.th.height")}</th>
+              <th>{t("chain.th.round")}</th>
+              <th>{t("chain.th.threshold")}</th>
+              <th>{t("chain.th.crossed")}</th>
             </tr>
           </thead>
           <tbody>
@@ -107,13 +109,10 @@ export function ChainPanel({
         </table>
       ) : (
         <p className="chart-empty">
-          {blocks?.reason ? `Provisional blocks unavailable (${blocks.reason})` : "No provisional blocks right now"}
+          {blocks?.reason ? `${t("chain.noProvisional")} (${blocks.reason})` : t("chain.noProvisional")}
         </p>
       )}
-      <p className="fine-print">
-        Provisional blocks are wheel work not yet settled on Ethereum. They issue no SQK until the
-        Reporter's settlement confirms and SqueekMining checkpoints the rounds.
-      </p>
+      <p className="fine-print">{t("chain.provisionalNote")}</p>
     </Panel>
   );
 }

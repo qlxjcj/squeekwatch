@@ -1,6 +1,7 @@
 import type { SettlementsResponse } from "../lib/types";
 import { formatAgo, formatCompact, formatCount, formatUnits, toBig, toNum } from "../lib/format";
 import { explorerTx } from "../lib/api";
+import { useI18n } from "../lib/i18n";
 import { BarChart } from "./Charts";
 import { Chip, Notice, Panel, Stat } from "./ui";
 
@@ -9,6 +10,7 @@ const asNum = (v: unknown): number | null => (typeof v === "string" || typeof v 
 const asBig = (v: unknown): bigint | null => (typeof v === "string" || typeof v === "number" ? toBig(v) : null);
 
 export function SettlementsPanel({ data }: { data: SettlementsResponse | null }) {
+  const { t } = useI18n();
   const summary = data?.summary;
   const mining = data?.mining;
 
@@ -22,60 +24,68 @@ export function SettlementsPanel({ data }: { data: SettlementsResponse | null })
       key: `${i}-${label}`,
       label,
       value: blocks,
-      title: `${label} · ${blocks} Squeek blocks${sqk !== null ? ` · ${formatUnits(sqk, 18, 2)} SQK` : ""}`,
+      title: `${label} · ${blocks} blocks${sqk !== null ? ` · ${formatUnits(sqk, 18, 2)} SQK` : ""}`,
     };
   });
 
   return (
     <Panel
-      title="Settlements & SQK issuance · last 24h"
-      subtitle="Rounds settle in batches; SQK is issued later, per round, at checkpoints"
+      title={t("set.title")}
+      subtitle={t("set.sub")}
       right={
         mining ? (
           <Chip tone={mining.status === "available" ? "green" : "gold"}>
-            {mining.status === "available" ? `mined ${formatCompact(mining.miningMintedBaseUnits, 18, 1)} SQK` : "issuance data unavailable"}
+            {mining.status === "available"
+              ? `${t("set.mined")} ${formatCompact(mining.miningMintedBaseUnits, 18, 1)} SQK`
+              : t("set.issuanceUnavailable")}
           </Chip>
         ) : null
       }
     >
-      {data?.reason ? <Notice tone="warn">Settlement history unavailable: {data.reason}</Notice> : null}
+      {data?.reason ? (
+        <Notice tone="warn">
+          {t("set.title")}: {data.reason}
+        </Notice>
+      ) : null}
 
       <div className="stat-row">
-        <Stat label="Settlements" value={formatCount(summary?.settlementCount)} sub="batches in window" />
-        <Stat label="Squeek blocks completed" value={formatCount(summary?.completedBlockCount)} tone="gold" />
-        <Stat label="Work added" value={formatCount(summary?.workAdded)} sub="work units" />
-        <Stat label="Active rounds" value={formatCount(summary?.activeRoundCount)} />
+        <Stat label={t("set.count")} value={formatCount(summary?.settlementCount)} sub={t("set.batches")} />
+        <Stat label={t("set.blocksDone")} value={formatCount(summary?.completedBlockCount)} tone="gold" />
+        <Stat label={t("set.workAdded")} value={formatCount(summary?.workAdded)} sub={t("chain.units")} />
+        <Stat label={t("set.activeRounds")} value={formatCount(summary?.activeRoundCount)} />
         <Stat
-          label="SQK issued (window)"
+          label={t("set.issued")}
           value={mining?.rangeMintedBaseUnits !== undefined ? `${formatCompact(mining.rangeMintedBaseUnits, 18, 2)} SQK` : "—"}
-          sub={mining?.rangeCheckpointCount !== undefined ? `${formatCount(mining.rangeCheckpointCount)} checkpoints` : undefined}
+          sub={mining?.rangeCheckpointCount !== undefined ? `${formatCount(mining.rangeCheckpointCount)} ${t("set.checkpoints")}` : undefined}
         />
       </div>
 
-      <h3 className="sub-title">Squeek blocks per hour</h3>
-      <BarChart bars={bars} color="var(--gold)" height={130} emptyText="No settlement activity in this window" />
+      <h3 className="sub-title">{t("set.perHour")}</h3>
+      <BarChart bars={bars} color="var(--gold)" height={130} emptyText={t("set.noActivity")} />
 
       {mining?.nextRound ? (
         <p className="fine-print">
-          next funding round {formatCount(mining.nextRound.round)} is{" "}
-          <Chip tone={mining.nextRound.state === "ready" ? "green" : "blue"}>{mining.nextRound.state}</Chip>{" "}
-          · {formatCount(mining.nextRound.completedBlockCount)} blocks so far ·{" "}
-          {formatCompact(mining.nextRound.amountBaseUnits, 18, 2)} SQK projected · rounds funded through{" "}
+          {t("set.nextRound")} {formatCount(mining.nextRound.round)}{" "}
+          <Chip tone={mining.nextRound.state === "ready" ? "green" : "blue"}>
+            {mining.nextRound.state === "ready" ? t("set.state.ready") : t("set.state.accruing")}
+          </Chip>{" "}
+          · {formatCount(mining.nextRound.completedBlockCount)} {t("set.blocksSoFar")} ·{" "}
+          {formatCompact(mining.nextRound.amountBaseUnits, 18, 2)} {t("set.sqkProjected")} · {t("set.fundedThrough")}{" "}
           {formatCount(mining.processedThroughRound)}
         </p>
       ) : null}
 
-      <h3 className="sub-title">Recent settlements</h3>
+      <h3 className="sub-title">{t("set.recent")}</h3>
       {data && data.recentSettlements.length > 0 ? (
         <table className="data-table">
           <thead>
             <tr>
-              <th>Rounds</th>
-              <th>Blocks</th>
-              <th>Work</th>
-              <th>SQK</th>
-              <th>When</th>
-              <th>Tx</th>
+              <th>{t("set.th.rounds")}</th>
+              <th>{t("set.th.blocks")}</th>
+              <th>{t("set.th.work")}</th>
+              <th>{t("set.th.sqk")}</th>
+              <th>{t("set.th.when")}</th>
+              <th>{t("set.th.tx")}</th>
             </tr>
           </thead>
           <tbody>
@@ -94,7 +104,7 @@ export function SettlementsPanel({ data }: { data: SettlementsResponse | null })
                 <td className="mono">
                   {row.sqkMintedBaseUnits !== undefined && row.sqkMintedBaseUnits !== null
                     ? formatCompact(row.sqkMintedBaseUnits, 18, 2)
-                    : "pending"}
+                    : t("set.pending")}
                 </td>
                 <td className="mono">{formatAgo(row.blockTimestamp)}</td>
                 <td>
@@ -107,7 +117,7 @@ export function SettlementsPanel({ data }: { data: SettlementsResponse | null })
           </tbody>
         </table>
       ) : (
-        <p className="chart-empty">No settlements that completed blocks in this window</p>
+        <p className="chart-empty">{t("set.noSettlements")}</p>
       )}
     </Panel>
   );

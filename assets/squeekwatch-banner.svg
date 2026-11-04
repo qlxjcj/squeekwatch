@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 340" width="1200" height="340" role="img" aria-label="SqueekWatch — live dashboard for Squeekchain">
+  <defs>
+    <pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.4" fill="#262634"/>
+    </pattern>
+    <radialGradient id="glow" cx="82%" cy="30%" r="55%">
+      <stop offset="0%" stop-color="#f5b942" stop-opacity="0.18"/>
+      <stop offset="55%" stop-color="#5b8cff" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#12121a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- background -->
+  <rect width="1200" height="340" fill="#12121a"/>
+  <rect width="1200" height="340" fill="url(#dots)"/>
+  <rect width="1200" height="340" fill="url(#glow)"/>
+  <rect x="0" y="0" width="1200" height="4" fill="#f5b942"/>
+
+  <!-- dot-matrix wheel -->
+  <g transform="translate(950 170)">
+    <circle r="128" fill="none" stroke="#2c2c3a" stroke-width="1.5"/>
+    <g>
+      <circle cx="0" cy="-118" r="4.4" fill="#f5b942" opacity="0.95"/>
+      <circle cx="41" cy="-110.6" r="4.4" fill="#f5b942" opacity="0.9"/>
+      <circle cx="77" cy="-89.7" r="4.4" fill="#f5b942" opacity="0.85"/>
+      <circle cx="102.2" cy="-59" r="4.4" fill="#f5b942" opacity="0.8"/>
+      <circle cx="112.7" cy="-22.6" r="4.4" fill="#f5b942" opacity="0.75"/>
+      <circle cx="107.2" cy="17" r="4.4" fill="#f5b942" opacity="0.8"/>
+      <circle cx="88.5" cy="53.6" r="4.4" fill="#f5b942" opacity="0.85"/>
+      <circle cx="60.1" cy="83.3" r="4.4" fill="#f5b942" opacity="0.9"/>
+      <circle cx="23.4" cy="101.2" r="4.4" fill="#f5b942" opacity="0.95"/>
+      <circle cx="-17.2" cy="104.7" r="4.4" fill="#f5b942" opacity="0.95"/>
+      <circle cx="-55.2" cy="92.8" r="4.4" fill="#f5b942" opacity="0.9"/>
+      <circle cx="-85.4" cy="67.6" r="4.4" fill="#f5b942" opacity="0.85"/>
+      <circle cx="-103.8" cy="32.6" r="4.4" fill="#f5b942" opacity="0.8"/>
+      <circle cx="-108.3" cy="-6.7" r="4.4" fill="#f5b942" opacity="0.75"/>
+      <circle cx="-98.4" cy="-45.7" r="4.4" fill="#f5b942" opacity="0.8"/>
+      <circle cx="-75.4" cy="-78.2" r="4.4" fill="#f5b942" opacity="0.85"/>
+      <circle cx="-42.6" cy="-100" r="4.4" fill="#f5b942" opacity="0.9"/>
+    </g>
+    <g opacity="0.5">
+      <circle cx="0" cy="-84" r="3.2" fill="#f5b942"/>
+      <circle cx="47.6" cy="-69.3" r="3.2" fill="#f5b942"/>
+      <circle cx="72.7" cy="-33.1" r="3.2" fill="#f5b942"/>
+      <circle cx="66.8" cy="12.2" r="3.2" fill="#f5b942"/>
+      <circle cx="34.1" cy="51.4" r="3.2" fill="#f5b942"/>
+      <circle cx="-12.2" cy="72" r="3.2" fill="#f5b942"/>
+      <circle cx="-55.7" cy="58.7" r="3.2" fill="#f5b942"/>
+      <circle cx="-78.4" cy="19.7" r="3.2" fill="#f5b942"/>
+      <circle cx="-69.2" cy="-25.5" r="3.2" fill="#f5b942"/>
+      <circle cx="-34.2" cy="-61.6" r="3.2" fill="#f5b942"/>
+    </g>
+    <g stroke="#5b8cff" stroke-width="1.2" opacity="0.5">
+      <line x1="0" y1="-118" x2="0" y2="118"/>
+      <line x1="-102.2" y1="-59" x2="102.2" y2="59"/>
+      <line x1="-102.2" y1="59" x2="102.2" y2="-59"/>
+    </g>
+    <circle r="16" fill="#5b8cff"/>
+    <circle r="7" fill="#12121a"/>
+  </g>
+
+  <!-- title -->
+  <g font-family="Arial, Helvetica, sans-serif">
+    <text x="64" y="86" fill="#f5b942" font-family="Courier New, monospace" font-size="15" letter-spacing="5">HAMSTER-POWERED PROOF OF WORK · LIVE ON SEPOLIA</text>
+    <text x="60" y="164" fill="#eaeaf2" font-size="66" font-weight="700" letter-spacing="10">SQUEEK</text>
+    <text x="378" y="164" fill="#f5b942" font-size="66" font-weight="700" letter-spacing="10">WATCH</text>
+    <text x="64" y="206" fill="#9a9ab0" font-size="21" letter-spacing="0.5">Live dashboard for Squeekchain — the wheel, the blocks, the SQK economy.</text>
+  </g>
+
+  <!-- chips -->
+  <g font-family="Courier New, monospace" font-size="13" letter-spacing="1">
+    <rect x="64" y="238" width="170" height="34" rx="17" fill="#20202c" stroke="#2c2c3a"/>
+    <text x="90" y="260" fill="#5b8cff">wheel telemetry</text>
+    <rect x="248" y="238" width="158" height="34" rx="17" fill="#20202c" stroke="#2c2c3a"/>
+    <text x="272" y="260" fill="#f5b942">squeek blocks</text>
+    <rect x="420" y="238" width="152" height="34" rx="17" fill="#20202c" stroke="#2c2c3a"/>
+    <text x="444" y="260" fill="#3ddc84">SQK economy</text>
+    <rect x="586" y="238" width="150" height="34" rx="17" fill="#20202c" stroke="#2c2c3a"/>
+    <text x="612" y="260" fill="#a78bfa">event feed</text>
+    <rect x="750" y="238" width="196" height="34" rx="17" fill="#20202c" stroke="#2c2c3a"/>
+    <text x="772" y="260" fill="#eaeaf2">read-only · no wallet</text>
+  </g>
+</svg>
